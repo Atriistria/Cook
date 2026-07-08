@@ -2,12 +2,18 @@ package com.atride.cook
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import com.atride.cook.di.initKoin
+import java.io.PrintStream
 
-fun main() = application {
-    Window(
-        onCloseRequest = ::exitApplication,
-        title = "Cook",
-    ) {
-        App()
+fun main() {
+    System.setOut(PrintStream(System.out, true, "UTF-8"))
+    application {
+        initKoin()
+        Window(
+            onCloseRequest = ::exitApplication,
+            title = "Cook",
+        ) {
+            App()
+        }
     }
 }

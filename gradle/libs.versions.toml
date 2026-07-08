@@ -22,6 +22,9 @@ ksp = "2.3.4"
 koin = "4.2.2"
 coil = "3.5.0"
 ktor = "3.3.3"
+room3 = "3.0.0"
+sqlite-bundled = "2.7.0"
+richeditorCompose = "1.0.0-rc14"
 
 
 [libraries]
@@ -63,8 +66,13 @@ coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.r
 # Koin - 依赖注入
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
 
+room3-runtime = { group = "androidx.room3", name = "room3-runtime", version.ref = "room3" }
+room3-compiler = { group = "androidx.room3", name = "room3-compiler", version.ref = "room3" }
+sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqlite-bundled" }
 
+richeditor-compose = { module = "com.mohamedrejeb.richeditor:richeditor-compose", version.ref = "richeditorCompose" }
 
 [plugins]
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
@@ -75,3 +83,5 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room3 = { id = "androidx.room3", version.ref = "room3" }
+

@@ -27,8 +27,7 @@ object MockData {
         Session("s2", "项目架构方案设计", "NiA风格的状态管理用UiState data class加普通函数调用就很清晰", "09:15", 8),
         Session("s3", "写一首关于秋天的诗", "秋风起兮白云飞，草木黄落兮雁南归", "昨天", 6),
         Session("s4", "DeepSeek模型对比", "DeepSeek-R1有671B参数，采用MoE架构...", "昨天", 15),
-        Session("s5", "旅行计划：京都", "建议游玩3-4天，第一天去清水寺和二年坂...", "周一", 22),
-        Session("s6", "Voyager vs Navigation", "JetBrains的Navigation Compose现在已经是官方推荐方案了", "周一", 4),
+        Session("s5", "Voyager vs Navigation", "JetBrains的Navigation Compose现在已经是官方推荐方案了", "周一", 4),
     )
 
     val currentMessages = listOf(

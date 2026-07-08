@@ -5,11 +5,11 @@ Cook 是一个基于 Kotlin Multiplatform (KMP) + Compose Multiplatform 构建�
 ## Features
 
 - **跨平台** — 一套代码同时运行在 Android、iOS 和 Desktop (JVM) 上
-- **AI 对话** — 基于 Koog Agents 框架 + DeepSeek 大语言模型，支持流式响应
+- **AI 对话** — 基于 Koog Agents 框架，支持流式响应
 - **多会话管理** — 侧边栏会话列表，支持切换与新建会话
 - **自适应布局** — 根据窗口/屏幕尺寸自动切换紧凑布局（抽屉式）和展开布局（侧栏 + 主区域）
 - **模型切换** — 在输入栏中快速切换 AI 模型
-- **现代化 UI** — 基于 Material3 设计系统 + Compose Multiplatform
+- **现代化 UI** — 基于 Material3 + Compose Multiplatform
 
 ## Tech Stack
 

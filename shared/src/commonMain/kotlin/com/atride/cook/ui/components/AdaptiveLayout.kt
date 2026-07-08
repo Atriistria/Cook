@@ -11,7 +11,21 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 enum class WindowSizeClass {
-    Compact, Medium, Expanded
+    Compact,     // 0 - 600dp (手机竖屏)
+    Medium,      // 600 - 840dp (折叠屏或平板竖屏)
+    Expanded,    // 840 - 1200dp (平板横屏)
+    Large,       // 1200 - 1600dp (普通电脑窗口)
+    ExtraLarge   // 1600dp+ (宽屏显示器)
+}
+
+fun getWindowSizeClass(width: Dp): WindowSizeClass {
+    return when {
+        width < 600.dp -> WindowSizeClass.Compact
+        width < 840.dp -> WindowSizeClass.Medium
+        width < 1200.dp -> WindowSizeClass.Expanded
+        width < 1600.dp -> WindowSizeClass.Large
+        else -> WindowSizeClass.ExtraLarge
+    }
 }
 
 @Composable
@@ -19,11 +33,7 @@ fun AdaptiveLayout(
     content: @Composable (WindowSizeClass) -> Unit
 ) {
     BoxWithConstraints {
-        val windowSizeClass = when {
-            maxWidth < 600.dp -> WindowSizeClass.Compact
-            maxWidth < 840.dp -> WindowSizeClass.Medium
-            else -> WindowSizeClass.Expanded
-        }
+        val windowSizeClass = getWindowSizeClass(maxWidth)
         content(windowSizeClass)
     }
 }
@@ -31,9 +41,13 @@ fun AdaptiveLayout(
 const val SESSION_PANEL_WIDTH_COMPACT = 0
 const val SESSION_PANEL_WIDTH_MEDIUM = 260
 const val SESSION_PANEL_WIDTH_EXPANDED = 300
+const val SESSION_PANEL_WIDTH_LARGE = 360
+const val SESSION_PANEL_WIDTH_ExtraLarge = 400
 
 fun WindowSizeClass.sessionPanelWidth(): Dp = when (this) {
-    WindowSizeClass.Compact -> SESSION_PANEL_WIDTH_COMPACT.dp
-    WindowSizeClass.Medium -> SESSION_PANEL_WIDTH_MEDIUM.dp
-    WindowSizeClass.Expanded -> SESSION_PANEL_WIDTH_EXPANDED.dp
+    WindowSizeClass.Compact -> SESSION_PANEL_WIDTH_COMPACT.dp           // 手机窄屏，不显示侧栏
+    WindowSizeClass.Medium -> SESSION_PANEL_WIDTH_MEDIUM.dp          // 平板竖屏，窄侧栏
+    WindowSizeClass.Expanded -> SESSION_PANEL_WIDTH_EXPANDED.dp        // 平板横屏，中等侧栏
+    WindowSizeClass.Large -> SESSION_PANEL_WIDTH_LARGE.dp           // 桌面窗口，宽侧栏
+    WindowSizeClass.ExtraLarge -> SESSION_PANEL_WIDTH_ExtraLarge.dp      // 宽屏，更宽
 }

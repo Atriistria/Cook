@@ -9,7 +9,13 @@ class KoogChatRepository(
 ) : ChatRepository {
 
     override fun sendMessageStream(message: String): Flow<String> = flow {
-        val result = agent.run(message)
-        emit(result)
+        println("发送信息")
+        try {
+            val result = agent.run(message)
+            println(result)
+            emit(result)
+        } catch (e: Exception) {
+            println(e)
+        }
     }
 }

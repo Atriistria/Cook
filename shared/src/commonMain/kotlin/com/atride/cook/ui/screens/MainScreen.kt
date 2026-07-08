@@ -55,15 +55,18 @@ import com.atride.cook.ui.components.sessionPanelWidth
 
 import com.atride.cook.ui.screens.chat.ChatBubble
 import com.atride.cook.ui.screens.chat.ChatInputBar
+import com.atride.cook.ui.screens.chat.ModelSelectorButton
 
 import kotlinx.coroutines.launch
 import androidx.compose.ui.tooling.preview.Preview
+import com.atride.cook.ui.DevicePreviews
+import com.atride.cook.ui.screens.chat.ChatViewModel
 import com.atride.cook.ui.theme.CookTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    onNavigateToSettings: () -> Unit
+    onNavigateToSettings: () -> Unit,
 ) {
     var selectedSessionId by remember { mutableStateOf<String?>(null) }
     var selectedModel by remember { mutableStateOf("gpt-4o") }
@@ -137,7 +140,7 @@ private fun CompactLayout(
                     Text("\u2630", fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurface)
                 }
             },
-            showModelSelector = true
+            modelInTopBar = true
         )
     }
 }
@@ -205,7 +208,6 @@ private fun ExpandedLayout(
                     }
                 }
             } else null,
-            showModelSelector = true
         )
     }
 }
@@ -264,7 +266,7 @@ private fun ChatArea(
     onModelChange: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
     navigationIcon: @Composable (() -> Unit)? = null,
-    showModelSelector: Boolean = false
+    modelInTopBar: Boolean = false
 ) {
     Scaffold(
         topBar = {
@@ -282,6 +284,12 @@ private fun ChatArea(
                     }
                 },
                 actions = {
+                    if (modelInTopBar) {
+                        ModelSelectorButton(
+                            selectedModel = selectedModel,
+                            onModelChange = onModelChange,
+                        )
+                    }
                     IconButton(onClick = onNavigateToSettings) {
                         Text("\u2699", fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
@@ -297,7 +305,8 @@ private fun ChatArea(
                 selectedModel = selectedModel,
                 onModelChange = onModelChange,
                 onSend = { /* noop for prototype */ },
-                showModelSelector = showModelSelector
+                desktopLayout = !modelInTopBar,
+                onAttachClick = {}
             )
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -407,7 +416,7 @@ private fun SessionListItem(
 
 // -- Previews --
 
-@Preview
+@DevicePreviews
 @Composable
 private fun PreviewMainScreen() {
     CookTheme {

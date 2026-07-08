@@ -57,6 +57,7 @@ class ChatViewModel(
                 }
                 .collect { chunk ->
                     accumulatedText += chunk
+                    println("viewmodel:$accumulatedText")
                     _uiState.update { state ->
                         val updatedList = state.messages.map { msg ->
                             if (msg.id == aiMsgId) msg.copy(content = accumulatedText) else msg

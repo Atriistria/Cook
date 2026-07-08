@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.room3)
 }
 
 kotlin {
@@ -64,9 +65,17 @@ kotlin {
             implementation(libs.coil.network.ktor3)
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+
+            implementation(libs.room3.runtime)
+            implementation(libs.sqlite.bundled)
+
 
             implementation(libs.koog.agents)
             implementation(libs.koog.agents.additions)
+
+            implementation(libs.richeditor.compose)
+
         }
 
         iosMain.dependencies {
@@ -84,6 +93,15 @@ kotlin {
     }
 }
 
+room3 {
+    schemaDirectory("$projectDir/schemas")
+}
+
 dependencies {
+    add("kspCommonMainMetadata", libs.room3.compiler)
+    add("kspAndroid", libs.room3.compiler)
+    add("kspIosArm64", libs.room3.compiler)
+    add("kspIosSimulatorArm64", libs.room3.compiler)
+    add("kspJvm", libs.room3.compiler)
     androidRuntimeClasspath(libs.compose.uiTooling)
 }
