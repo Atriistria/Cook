@@ -111,7 +111,9 @@ class KtorKoogHttpClient(
         println("Koog HTTP Status: ${response.status.value}")
         val responseText = response.bodyAsText()
         println("Koog HTTP Response: $responseText")
-
+        if (response.status.value !in 200..299) {
+            throw Exception("HTTP request failed with status ${response.status.value}: $responseText")
+        }
         // 🌟 核心修改：如果是 String 类型，直接返回原始报文，防止 kotlinx-serialization 误判
         return if (responseType == String::class) {
             responseText as R
