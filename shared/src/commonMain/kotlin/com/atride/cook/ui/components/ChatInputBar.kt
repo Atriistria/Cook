@@ -29,8 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.atride.cook.ui.screens.chat.ChatViewModel
-import org.koin.compose.viewmodel.koinViewModel
 
 val availableModels = listOf("gpt-4o", "gpt-4o-mini", "claude-opus-4", "deepseek-v4", "gemini-2.5-pro")
 

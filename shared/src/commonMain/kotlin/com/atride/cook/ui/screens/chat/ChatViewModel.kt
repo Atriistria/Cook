@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.atride.cook.data.ChatRepository
 import com.atride.cook.model.ChatMessage
+import com.atride.cook.model.ChatStreamEvent
 import com.atride.cook.model.MessageRole
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -15,6 +16,16 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.random.Random
+
+data class Message(
+    val id: String,
+    val sender: MessageRole,
+    val text: String,
+    val reasoningText: String = "", // 新增：用于单独存储思维链的思考路径
+    val inputTokens: Int = 0,       // 新增：用于记录输入消耗的 Token
+    val outputTokens: Int = 0,      // 新增：用于记录输出生成的 Token
+    val timestamp: Long = 0L
+)
 
 class ChatViewModel(
     private val repository: ChatRepository
@@ -39,8 +50,9 @@ class ChatViewModel(
             val userMsgId = "user_" + Random.nextLong(Long.MAX_VALUE) // 自定义简单 ID 生成即可
             val aiMsgId = "ai_" + Random.nextLong(Long.MAX_VALUE)
 
-            val userMsg = ChatMessage(id = userMsgId, role = MessageRole.User, content = text)
-            val aiPlaceholderMsg = ChatMessage(id = aiMsgId, role = MessageRole.Assistant, content = "")
+            val userMsg = Message(id = userMsgId, sender = MessageRole.User, text = text)
+            // AI 的初始占位符消息，文字和思维链都默认为空
+            val aiPlaceholderMsg = Message(id = aiMsgId, sender = MessageRole.Assistant, text = "")
 
             _uiState.update { state ->
                 state.copy(
@@ -50,23 +62,47 @@ class ChatViewModel(
                 )
             }
 
+            // 本地状态累加器，用于在协程中逐步拼接流式字符
+            var accumulatedReasoning = ""
             var accumulatedText = ""
+
             repository.sendMessageStream(text)
                 .catch { e ->
                     _uiState.update { it.copy(error = e.message, isSending = false) }
                 }
-                .collect { chunk ->
-                    accumulatedText += chunk
-                    println("viewmodel:$accumulatedText")
+                .collect { event ->
                     _uiState.update { state ->
                         val updatedList = state.messages.map { msg ->
-                            if (msg.id == aiMsgId) msg.copy(content = accumulatedText) else msg
+                            if (msg.id == aiMsgId) {
+                                when (event) {
+                                    is ChatStreamEvent.Think -> {
+                                        println("Think:${event.text}")
+                                        accumulatedReasoning += event.text
+                                        msg.copy(reasoningText = accumulatedReasoning)
+                                    }
+                                    is ChatStreamEvent.Text -> {
+                                        println("Text:${event.text}")
+                                        accumulatedText += event.text
+                                        msg.copy(text = accumulatedText)
+                                    }
+                                    is ChatStreamEvent.TokenUsage -> {
+                                        println("TokenUsage:${event.totalTokens}")
+                                        msg.copy(
+                                            inputTokens = event.inputTokens,
+                                            outputTokens = event.outputTokens
+                                        )
+                                    }
+                                }
+                            } else {
+                                msg
+                            }
                         }
                         state.copy(messages = updatedList)
                     }
-                    _effect.send(ChatEffect.ScrollToBottom)
+
                 }
 
+            // 流式传输彻底结束，关闭加载状态
             _uiState.update { it.copy(isSending = false) }
         }
     }

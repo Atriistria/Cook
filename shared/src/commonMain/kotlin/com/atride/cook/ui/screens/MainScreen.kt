@@ -59,9 +59,11 @@ import com.atride.cook.ui.screens.chat.ModelSelectorButton
 
 import kotlinx.coroutines.launch
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.atride.cook.ui.DevicePreviews
 import com.atride.cook.ui.screens.chat.ChatViewModel
 import com.atride.cook.ui.theme.CookTheme
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -266,8 +268,10 @@ private fun ChatArea(
     onModelChange: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
     navigationIcon: @Composable (() -> Unit)? = null,
-    modelInTopBar: Boolean = false
+    modelInTopBar: Boolean = false,
+    viewModel: ChatViewModel = koinViewModel()
 ) {
+    val text = viewModel.uiState.collectAsStateWithLifecycle()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -327,7 +331,7 @@ private fun ChatArea(
             ) {
                 item { Spacer(modifier = Modifier.height(8.dp)) }
                 items(
-                    items = messages,
+                    items = text.value.messages,
                     key = { it.id }
                 ) { message ->
                     ChatBubble(message = message)

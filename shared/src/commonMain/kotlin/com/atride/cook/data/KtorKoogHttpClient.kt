@@ -136,6 +136,7 @@ class KtorKoogHttpClient(
         println("🌟 开始建立 SSE 流式连接: $fullUrl")
 
         val bodyText = resolveBodyText(requestBody, requestBodyType)
+        println("🌟 SSE request body: $bodyText")
 
         // 1. 使用 preparePost 建立延迟下载连接
         ktorClient.preparePost(fullUrl) {
@@ -160,28 +161,21 @@ class KtorKoogHttpClient(
                 // 3. 筛选出标准的 SSE 数据行
                 if (trimmed.startsWith("data: ")) {
                     val rawData = trimmed.substringAfter("data: ").trim()
-
-                    // 遇到 [DONE] 标记表示流传输结束
+                    println(rawData)
                     if (rawData == "[DONE]") {
-                        println("🌟 SSE 数据流已正常传输结束")
+                        println("🌟 SSE 数据流正常结束")
                         break
                     }
 
-                    // 4. 依次调用 Koog 的内置链条进行数据清洗、解码和二次转换
                     if (dataFilter(rawData)) {
                         try {
-                            // 调用 Koog 传入的解码函数转换为中间类型 R
                             val decoded = decodeStreamingResponse(rawData)
-
-                            // 调用 Koog 传入的清洗函数转换为最终输出类型 O
                             val processed = processStreamingChunk(decoded)
-
-                            // 5. 如果转换后的结果不为空，立即发射出去（UI 就会实时收到一个字或词）
                             if (processed != null) {
                                 emit(processed)
                             }
                         } catch (e: Exception) {
-                            // 忽略单个分片的解析异常，防止大模型偶尔返回空白帧导致整条流中断
+                            // 优雅地忽略单个异常分片
                         }
                     }
                 }

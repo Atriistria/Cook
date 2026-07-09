@@ -267,10 +267,10 @@ fun ModelSelectorButton(
 
 @Composable
 fun ChatBubble(
-    message: ChatMessage,
+    message: Message,
     modifier: Modifier = Modifier
 ) {
-    val isUser = message.role == MessageRole.User
+    val isUser = message.sender == MessageRole.User
     val bubbleColor = if (isUser) {
         MaterialTheme.colorScheme.primary
     } else {
@@ -307,7 +307,7 @@ fun ChatBubble(
                 .padding(horizontal = 16.dp, vertical = 10.dp)
         ) {
             RenderMarkdownContent(
-                text = message.content,
+                text = message.text,
                 bubbleTextColor = onBubbleColor
             )
         }
@@ -406,10 +406,10 @@ private fun Color.luminance(): Float {
 private fun PreviewChatBubbleUser() {
     CookTheme {
         ChatBubble(
-            message = ChatMessage(
+            message = Message(
                 id = "preview_user",
-                content = "Hello! This is a user message.",
-                role = MessageRole.User
+                text = "Hello! This is a user message.",
+                sender = MessageRole.User
             )
         )
     }
@@ -420,14 +420,14 @@ private fun PreviewChatBubbleUser() {
 private fun PreviewChatBubbleAssistant() {
     CookTheme {
         ChatBubble(
-            message = ChatMessage(
+            message = Message(
                 id = "preview_ai",
-                content = """Hi there! This is an **assistant** response with a code block:
+                text = """Hi there! This is an **assistant** response with a code block:
 
 ```kotlin
 fun hello() = println("Hello")
 """.trimIndent(),
-                role = MessageRole.Assistant
+                sender = MessageRole.Assistant
             )
         )
     }
