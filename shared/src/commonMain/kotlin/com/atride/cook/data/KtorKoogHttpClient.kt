@@ -28,7 +28,6 @@ import kotlinx.serialization.serializer
 import kotlin.reflect.KClass
 import io.ktor.http.content.TextContent
 
-
 @OptIn(InternalSerializationApi::class)
 class KtorKoogHttpClient(
     override val clientName: String,
@@ -161,7 +160,6 @@ class KtorKoogHttpClient(
                 // 3. 筛选出标准的 SSE 数据行
                 if (trimmed.startsWith("data: ")) {
                     val rawData = trimmed.substringAfter("data: ").trim()
-                    println(rawData)
                     if (rawData == "[DONE]") {
                         println("🌟 SSE 数据流正常结束")
                         break

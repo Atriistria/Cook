@@ -61,6 +61,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.atride.cook.ui.DevicePreviews
+import com.atride.cook.ui.components.ContextMenu
 import com.atride.cook.ui.screens.chat.ChatViewModel
 import com.atride.cook.ui.theme.CookTheme
 import org.koin.compose.viewmodel.koinViewModel
@@ -334,7 +335,14 @@ private fun ChatArea(
                     items = text.value.messages,
                     key = { it.id }
                 ) { message ->
-                    ChatBubble(message = message)
+                    ContextMenu(
+                        items = listOf("复制"),
+                        onItemClick = {} ,
+                        selectedText = message.text,
+                        content =  {
+                            ChatBubble(message = message)
+                        }
+                    )
                 }
                 item { Spacer(modifier = Modifier.height(80.dp)) }
             }

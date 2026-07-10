@@ -55,9 +55,11 @@ import ai.koog.prompt.executor.clients.openai.models.ReasoningSummary
 import ai.koog.prompt.executor.llms.all.simpleOpenAIExecutor
 import ai.koog.prompt.executor.model.PromptExecutor
 import ai.koog.prompt.streaming.toMessageResponse
+import com.atride.cook.data.DeepSeekRepository
+import com.atride.cook.data.KtorKoogHttpClient
 import kotlinx.coroutines.flow.toList
+import kotlinx.serialization.json.Json
 
-val agentEventFlow = MutableSharedFlow<StreamFrame>(extraBufferCapacity = 100)
 const val api = ""
 
 val appModule = module {
@@ -69,46 +71,21 @@ val appModule = module {
             .build()
     }
 
-    single { get<AppDatabase>().sessionDao() }
-
     single<ChatRepository> {
-        val prompt = prompt(
-            id = "companion-assistant",
-            params = LLMParams(
-                additionalProperties = mapOf(
-                    "thinking" to buildJsonObject {
-                        put("type", "enabled")
-                    },
-                    "reasoning_effort" to JsonPrimitive("high"),
-                    "stream" to JsonPrimitive("true")
-                )
-            )
-        ) {
-            system("你是一个专业的 AI 助理。请使用 Markdown 格式友好地回答用户。")
-        }
-
-        val client = DeepSeekLLMClient(
-            api,
-            httpClientFactory = KtorKoogHttpClientFactory()
+        val httpClient = KtorKoogHttpClientFactory().create(
+            clientName = "DeepSeek",
+            baseUrl = "https://api.deepseek.com",
+            headers = mapOf("Authorization" to "Bearer $api"),
+            queryParameters = emptyMap(),
+            requestTimeoutMillis = 300_000,
+            connectTimeoutMillis = 60_000,
+            socketTimeoutMillis = 60_000,
+            json = Json { ignoreUnknownKeys = true; isLenient = true; encodeDefaults = true }
         )
-
-        val agent = AIAgent.builder()
-            .graphStrategy(streamingWithToolsStrategy())
-            .promptExecutor(MultiLLMPromptExecutor(client))
-            .prompt(prompt)
-            .maxIterations(5)
-            .llmModel(DeepSeekModels.DeepSeekV4Pro)
-            .install {
-                handleEvents {
-                    onLLMStreamingFrameReceived { ctx ->
-                        agentEventFlow.tryEmit(ctx.streamFrame)
-                    }
-                }
-            }
-            .build()
-
-        KoogChatRepository(agent, agentEventFlow)
+        DeepSeekRepository(httpClient as KtorKoogHttpClient, "你是一个专业的 AI 助理。请使用 Markdown 格式友好地回答用户。")
     }
+
+    single { get<AppDatabase>().sessionDao() }
 
     factory { ChatViewModel(get()) }
 
@@ -141,3 +118,42 @@ fun streamingWithToolsStrategy() = strategy("streaming_loop") {
     edge(nodeSendToolResults forwardTo nodeFinish onTextMessage { true })
     edge(nodeCallLLM forwardTo nodeFinish onTextMessage { true })
 }
+//
+//single<ChatRepository> {
+//    val prompt = prompt(
+//        id = "companion-assistant",
+//        params = LLMParams(
+//            additionalProperties = mapOf(
+//                "thinking" to buildJsonObject {
+//                    put("type", "enabled")
+//                },
+//                "reasoning_effort" to JsonPrimitive("high"),
+//                "stream" to JsonPrimitive("true")
+//            )
+//        )
+//    ) {
+//        system("你是一个专业的 AI 助理。请使用 Markdown 格式友好地回答用户。")
+//    }
+//
+//    val client = DeepSeekLLMClient(
+//        api,
+//        httpClientFactory = KtorKoogHttpClientFactory()
+//    )
+//
+//    val agent = AIAgent.builder()
+//        .graphStrategy(streamingWithToolsStrategy())
+//        .promptExecutor(MultiLLMPromptExecutor(client))
+//        .prompt(prompt)
+//        .maxIterations(5)
+//        .llmModel(DeepSeekModels.DeepSeekV4Pro)
+//        .install {
+//            handleEvents {
+//                onLLMStreamingFrameReceived { ctx ->
+//                    agentEventFlow.tryEmit(ctx.streamFrame)
+//                }
+//            }
+//        }
+//        .build()
+//
+//    KoogChatRepository(agent, agentEventFlow)
+//}
