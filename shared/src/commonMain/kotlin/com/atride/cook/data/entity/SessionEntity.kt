@@ -7,7 +7,6 @@ import androidx.room3.PrimaryKey
 data class SessionEntity(
     @PrimaryKey val id: String,
     val title: String,
-    val lastMessage: String,
-    val timestamp: String,
-    val messageCount: Int = 0
+    val createdAt: Long,
+    val updatedAt: Long,
 )

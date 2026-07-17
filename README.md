@@ -17,7 +17,7 @@ Cook 是一个基于 Kotlin Multiplatform (KMP) + Compose Multiplatform 构建�
 |----------|------------------------------------------|
 | 语言       | Kotlin 2.3.10                            |
 | UI 框架    | Compose Multiplatform 1.11.1 + Material3 |
-| AI 引擎    | Koog Agents 1.0.0 + DeepSeek             |
+| AI 引擎    | Koog Agents 1.0.0                        |
 | 导航       | Navigation Compose (JetBrains) 2.9.2     |
 | HTTP 客户端 | Ktor 3.3.3                               |
 | 依赖注入     | Koin 4.2.2                               |

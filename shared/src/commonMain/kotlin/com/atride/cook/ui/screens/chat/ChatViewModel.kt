@@ -7,6 +7,7 @@ import com.atride.cook.model.ChatMessage
 import com.atride.cook.model.ChatStreamEvent
 import com.atride.cook.model.MessageRole
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,6 +17,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.random.Random
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
+import kotlin.time.Clock
 
 data class Message(
     val id: String,
@@ -30,6 +34,27 @@ data class Message(
 class ChatViewModel(
     private val repository: ChatRepository
 ): ViewModel() {
+
+    @OptIn(ExperimentalUuidApi::class)
+    private val sessionId: String = Uuid.random().toString()
+
+    init {
+        viewModelScope.launch {
+            val history = repository.getMessages(sessionId)
+            _uiState.update { state ->
+                state.copy(
+                    messages = history.map { msg ->
+                        Message(
+                            id = msg.id,
+                            sender = msg.role,
+                            text = msg.content,
+                            timestamp = msg.timestamp
+                        )
+                    }
+                )
+            }
+        }
+    }
 
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState: StateFlow<ChatUiState> = _uiState.asStateFlow()
@@ -66,7 +91,7 @@ class ChatViewModel(
             var accumulatedReasoning = ""
             var accumulatedText = ""
 
-            repository.sendMessageStream(text)
+            repository.sendMessageStream(text, sessionId)
                 .catch { e ->
                     _uiState.update { it.copy(error = e.message, isSending = false) }
                 }
@@ -104,6 +129,13 @@ class ChatViewModel(
 
             // 流式传输彻底结束，关闭加载状态
             _uiState.update { it.copy(isSending = false) }
+
+            // 保存消息到本地
+            val now = Clock.System.now().toEpochMilliseconds()
+            repository.saveMessages(sessionId, listOf(
+                ChatMessage(userMsgId, text, MessageRole.User, now),
+                ChatMessage(aiMsgId, accumulatedText, MessageRole.Assistant, now)
+            ))
         }
     }
 }

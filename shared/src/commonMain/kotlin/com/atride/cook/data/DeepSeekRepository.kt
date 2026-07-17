@@ -1,6 +1,7 @@
 package com.atride.cook.data
 
 import com.atride.cook.model.ChatStreamEvent
+import com.atride.cook.model.ChatMessage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.addJsonObject
@@ -19,7 +20,13 @@ class DeepSeekRepository(
     private val systemPrompt: String
 ) : ChatRepository {
 
-    override fun sendMessageStream(message: String): Flow<ChatStreamEvent> {
+    override suspend fun getMessages(sessionId: String): List<ChatMessage> = emptyList()
+
+    override suspend fun saveMessages(sessionId: String, messages: List<ChatMessage>) {
+        // 备份实现，不持久化
+    }
+
+    override fun sendMessageStream(message: String, sessionId: String): Flow<ChatStreamEvent> {
         // 1. 构建请求体 JSON
         val body = buildJsonObject {
             put("model", "deepseek-v4-pro")
