@@ -14,19 +14,23 @@ import ai.koog.prompt.llm.LLModel
 import ai.koog.prompt.streaming.StreamFrame
 import ai.koog.prompt.streaming.toMessageResponse
 import com.atride.cook.data.dao.MessageDao
+import com.atride.cook.data.dao.SessionDao
 import com.atride.cook.data.entity.MessageEntity
+import com.atride.cook.data.entity.SessionEntity
 import com.atride.cook.model.ChatMessage
 import com.atride.cook.model.ChatStreamEvent
 import com.atride.cook.model.MessageRole
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.toList
+import kotlin.time.Clock
 
 class KoogChatRepository(
     private val promptExecutor: PromptExecutor,
     private val llmModel: LLModel,
     private val systemPrompt: String,
     private val messageDao: MessageDao,
+    private val sessionDao: SessionDao,
 ) : ChatRepository {
 
     override suspend fun getMessages(sessionId: String): List<ChatMessage> {
@@ -64,8 +68,18 @@ class KoogChatRepository(
 
     override fun sendMessageStream(message: String, sessionId: String): Flow<ChatStreamEvent> =
         channelFlow {
-            val history = messageDao.getBySession(sessionId)
+            // 自动创建 session
+            if (sessionDao.getById(sessionId) == null) {
+                val now = Clock.System.now().toEpochMilliseconds()
+                sessionDao.insertSession(SessionEntity(
+                    id = sessionId,
+                    title = "新对话",
+                    createdAt = now,
+                    updatedAt = now,
+                ))
+            }
 
+            val history = messageDao.getBySession(sessionId)
             val chatPrompt = prompt("chat") {
                 system(systemPrompt)
                 history.forEach { msg ->
