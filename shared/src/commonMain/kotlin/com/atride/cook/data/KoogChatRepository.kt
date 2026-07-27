@@ -1,4 +1,4 @@
-package com.atride.cook.data
+﻿package com.atride.cook.data
 
 import ai.koog.agents.core.agent.AIAgent
 import ai.koog.agents.core.dsl.builder.strategy
@@ -8,6 +8,7 @@ import ai.koog.agents.core.dsl.extension.nodeLLMSendToolResultsStreaming
 import ai.koog.agents.core.dsl.extension.onTextMessage
 import ai.koog.agents.core.dsl.extension.onToolCalls
 import ai.koog.agents.features.eventHandler.feature.handleEvents
+import ai.koog.agents.core.tools.ToolRegistry
 import ai.koog.prompt.dsl.prompt
 import ai.koog.prompt.executor.model.PromptExecutor
 import ai.koog.prompt.llm.LLModel
@@ -29,6 +30,7 @@ class KoogChatRepository(
     private val promptExecutor: PromptExecutor,
     private val llmModel: LLModel,
     private val systemPrompt: String,
+    private val toolRegistry: ToolRegistry = ToolRegistry {},
     private val messageDao: MessageDao,
     private val sessionDao: SessionDao,
 ) : ChatRepository {
@@ -68,7 +70,6 @@ class KoogChatRepository(
 
     override fun sendMessageStream(message: String, sessionId: String): Flow<ChatStreamEvent> =
         channelFlow {
-            // 自动创建 session
             if (sessionDao.getById(sessionId) == null) {
                 val now = Clock.System.now().toEpochMilliseconds()
                 sessionDao.insertSession(SessionEntity(
@@ -94,6 +95,7 @@ class KoogChatRepository(
                 .graphStrategy(streamingWithToolsStrategy())
                 .promptExecutor(promptExecutor)
                 .prompt(chatPrompt)
+                .toolRegistry(toolRegistry)
                 .llmModel(llmModel)
                 .install {
                     handleEvents {

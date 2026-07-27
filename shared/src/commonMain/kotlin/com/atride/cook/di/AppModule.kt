@@ -1,5 +1,6 @@
-package com.atride.cook.di
+﻿package com.atride.cook.di
 
+import ai.koog.agents.core.tools.ToolRegistry
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.atride.cook.data.AppDatabase
 import com.atride.cook.data.ChatRepository
@@ -7,6 +8,8 @@ import com.atride.cook.data.KoogChatRepository
 import com.atride.cook.data.dao.MessageDao
 import com.atride.cook.data.dao.SessionDao
 import com.atride.cook.data.KtorKoogHttpClientFactory
+import com.atride.cook.data.tools.WebSearchTool
+import com.atride.cook.common.SystemPromptLoader
 import com.atride.cook.model.getDatabaseBuilder
 import com.atride.cook.ui.screens.chat.ChatViewModel
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +21,7 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 
-const val api = "sk-cdb5eb56714d425382dd7b031d8cbd81"
+const val api = ""
 
 val appModule = module {
 
@@ -31,7 +34,11 @@ val appModule = module {
 
     single<ChatRepository> {
         val db = get<AppDatabase>()
-        val messageDao = db.messageDao()
+
+        val toolRegistry = ToolRegistry {
+            tool(WebSearchTool)
+        }
+
         val client = DeepSeekLLMClient(
             api,
             httpClientFactory = KtorKoogHttpClientFactory()
@@ -40,7 +47,8 @@ val appModule = module {
         KoogChatRepository(
             promptExecutor = promptExecutor,
             llmModel = DeepSeekModels.DeepSeekV4Pro,
-            systemPrompt = "你是一个专业的 AI 助理。请使用 Markdown 格式友好地回答用户。",
+            systemPrompt = SystemPromptLoader.value,
+            toolRegistry = toolRegistry,
             messageDao = db.messageDao(),
             sessionDao = db.sessionDao(),
         )

@@ -43,6 +43,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
 
             implementation(libs.ktor.client.okhttp)
+
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
