@@ -18,6 +18,19 @@ enum class WindowSizeClass {
     ExtraLarge   // 1600dp+ (宽屏显示器)
 }
 
+enum class LayoutMode { SINGLE_PANE, DUAL_PANE, TRIPLE_PANE }
+
+fun WindowSizeClass.layoutMode(): LayoutMode = when (this) {
+    WindowSizeClass.Compact -> LayoutMode.SINGLE_PANE
+    WindowSizeClass.Medium,
+    WindowSizeClass.Expanded -> LayoutMode.DUAL_PANE
+
+    WindowSizeClass.Large,
+    WindowSizeClass.ExtraLarge -> LayoutMode.TRIPLE_PANE
+}
+
+enum class ThemeMode { LIGHT, DARK, SYSTEM }
+
 fun getWindowSizeClass(width: Dp): WindowSizeClass {
     return when {
         width < 600.dp -> WindowSizeClass.Compact
