@@ -46,7 +46,6 @@ Cook/
 │       │   ├── App.kt               # 根 Composable
 │       │   ├── Greeting.kt
 │       │   ├── GreetingUtil.kt
-│       │   ├── Platform.kt          # expect/actual 平台接口
 │       │   ├── data/                # 数据层（Repository、HTTP 客户端）
 │       │   ├── di/                  # 依赖注入 (Koin Module)
 │       │   ├── model/               # 数据模型

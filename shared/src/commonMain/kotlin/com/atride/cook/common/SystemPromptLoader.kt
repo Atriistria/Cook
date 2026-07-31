@@ -9,7 +9,6 @@ import kotlinx.coroutines.withContext
 
 object SystemPromptLoader {
 
-    /** 同步懒加载，适合 DI 等同步场景直接使用 */
     @OptIn(ExperimentalResourceApi::class)
     val value: String by lazy {
         runBlocking(Dispatchers.IO) {
@@ -17,9 +16,6 @@ object SystemPromptLoader {
         }
     }
 
-    /**
-     * 协程友好的异步加载，适合 suspend 上下文。
-     */
     @OptIn(ExperimentalResourceApi::class)
     suspend fun load(): String {
         return withContext(Dispatchers.IO) {

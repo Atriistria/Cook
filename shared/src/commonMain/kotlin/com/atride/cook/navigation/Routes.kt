@@ -1,13 +1,6 @@
-package com.atride.cook.navigation
+﻿package com.atride.cook.navigation
 
 import kotlinx.serialization.Serializable
-
-@Serializable
-object MainRoute
-
-@Serializable
-object SettingsRoute
-
 
 @Serializable
 sealed interface Route {
