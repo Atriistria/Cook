@@ -4,10 +4,10 @@ import androidx.room3.ConstructedBy
 import androidx.room3.Database
 import androidx.room3.RoomDatabase
 import androidx.room3.RoomDatabaseConstructor
-import com.atride.cook.data.dao.SessionDao
 import com.atride.cook.data.dao.MessageDao
-import com.atride.cook.data.entity.SessionEntity
+import com.atride.cook.data.dao.SessionDao
 import com.atride.cook.data.entity.MessageEntity
+import com.atride.cook.data.entity.SessionEntity
 
 
 @Database(

@@ -1,7 +1,7 @@
 package com.atride.cook.data
 
-import com.atride.cook.model.ChatStreamEvent
 import com.atride.cook.model.ChatMessage
+import com.atride.cook.model.ChatStreamEvent
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {

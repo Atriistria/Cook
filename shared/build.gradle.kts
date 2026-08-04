@@ -19,14 +19,14 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     jvm()
-    
-    androidLibrary {
+
+    android {
        namespace = "com.atride.cook.shared"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
        minSdk = libs.versions.android.minSdk.get().toInt()
-    
+
        compilerOptions {
            jvmTarget = JvmTarget.JVM_17
        }
@@ -37,7 +37,7 @@ kotlin {
            isIncludeAndroidResources = true
        }
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
@@ -56,6 +56,8 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+
+            implementation(libs.androidx.navigation3.runtime)
 
             implementation(libs.adaptive)
 

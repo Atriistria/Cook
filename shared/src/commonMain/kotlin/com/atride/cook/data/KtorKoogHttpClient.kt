@@ -17,6 +17,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
+import io.ktor.http.content.TextContent
 import io.ktor.http.contentType
 import io.ktor.utils.io.readUTF8Line
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +27,6 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import kotlin.reflect.KClass
-import io.ktor.http.content.TextContent
 
 @OptIn(InternalSerializationApi::class)
 class KtorKoogHttpClient(

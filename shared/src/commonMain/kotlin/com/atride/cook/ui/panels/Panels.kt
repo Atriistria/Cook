@@ -1,4 +1,4 @@
-package com.atride.cook.ui.panels
+﻿package com.atride.cook.ui.panels
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -11,38 +11,34 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.atride.cook.goBack
+import com.atride.cook.navigation.CookNavigator
 import com.atride.cook.navigation.Route
-import com.atride.cook.ui.CookAppState
 import com.atride.cook.ui.screens.SettingsScreen
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun SinglePaneLayout(
-    backStack: SnapshotStateList<Route>,
-    appState: CookAppState,
+    navigator: CookNavigator,
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val settingsRoute = backStack.lastOrNull()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
                 SessionListPanel(
-                    selectedSessionId = appState.selectedSessionId ?: "",
+                    selectedSessionId = navigator.selectedSessionId ?: "",
                     onSessionClick = { id ->
-                        appState.selectedSessionId = id
+                        navigator.openSession(id) // 🌟 使用 navigator 导航
                         scope.launch { drawerState.close() }
                     },
                     onNewSession = {
-                        appState.selectedSessionId = "new"
+                        navigator.openSession("new")
                         scope.launch { drawerState.close() }
                     },
                     modifier = Modifier.fillMaxHeight(),
@@ -50,11 +46,13 @@ fun SinglePaneLayout(
             }
         },
     ) {
-        if (settingsRoute is Route.Settings) {
-            SettingsScreen(onNavigateBack = { backStack.goBack() })
-        } else {
-            ChatArea(
-                selectedSessionId = appState.selectedSessionId,
+        when (navigator.currentRoute) { // 🌟 直接使用 navigator 的计算属性
+            is Route.Settings -> SettingsScreen(
+                onNavigateBack = { navigator.goBack() },
+            )
+
+            else -> ChatArea(
+                selectedSessionId = navigator.selectedSessionId,
                 onMenuClick = { scope.launch { drawerState.open() } },
                 modifier = Modifier.fillMaxSize(),
             )
@@ -64,24 +62,25 @@ fun SinglePaneLayout(
 
 @Composable
 fun DualPaneLayout(
-    backStack: SnapshotStateList<Route>,
-    appState: CookAppState,
+    navigator: CookNavigator,
     panelWidth: Dp,
 ) {
-    val settingsRoute = backStack.lastOrNull()
+
     Row(Modifier.fillMaxSize()) {
         SessionListPanel(
-            selectedSessionId = appState.selectedSessionId ?: "",
-            onSessionClick = { id -> appState.selectedSessionId = id },
-            onNewSession = { appState.selectedSessionId = "new" },
+            selectedSessionId = navigator.selectedSessionId ?: "",
+            onSessionClick = { id -> navigator.openSession(id) },
+            onNewSession = { navigator.openSession("new") },
             modifier = Modifier.width(panelWidth).fillMaxHeight(),
         )
         Box(Modifier.weight(1f).fillMaxHeight()) {
-            if (settingsRoute is Route.Settings) {
-                SettingsScreen(onNavigateBack = { backStack.goBack() })
-            } else {
-                ChatArea(
-                    selectedSessionId = appState.selectedSessionId,
+            when (navigator.currentRoute) {
+                is Route.Settings -> SettingsScreen(
+                    onNavigateBack = { navigator.goBack() },
+                )
+
+                else -> ChatArea(
+                    selectedSessionId = navigator.selectedSessionId,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -91,34 +90,33 @@ fun DualPaneLayout(
 
 @Composable
 fun TriplePaneLayout(
-    backStack: SnapshotStateList<Route>,
-    appState: CookAppState,
+    navigator: CookNavigator,
     panelWidth: Dp,
     isContextPanelExpanded: Boolean,
     onContextPanelToggle: () -> Unit,
 ) {
-    val settingsRoute = backStack.lastOrNull()
+
     Row(Modifier.fillMaxSize()) {
         SessionListPanel(
-            selectedSessionId = appState.selectedSessionId ?: "",
-            onSessionClick = { id -> appState.selectedSessionId = id },
-            onNewSession = { appState.selectedSessionId = "new" },
+            selectedSessionId = navigator.selectedSessionId ?: "",
+            onSessionClick = { id -> navigator.openSession(id) },
+            onNewSession = { navigator.openSession("new") },
             modifier = Modifier.width(panelWidth).fillMaxHeight(),
         )
-        if (settingsRoute is Route.Settings) {
-            SettingsScreen(onNavigateBack = { backStack.goBack() })
-        } else {
-            ChatArea(
-                selectedSessionId = appState.selectedSessionId,
-                modifier = Modifier.weight(1f).fillMaxHeight(),
-            )
+        Box(Modifier.weight(1f).fillMaxHeight()) {
+            when (navigator.currentRoute) {
+                is Route.Settings -> SettingsScreen(
+                    onNavigateBack = { navigator.goBack() },
+                )
+
+                else -> ChatArea(
+                    selectedSessionId = navigator.selectedSessionId,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
         }
         if (isContextPanelExpanded) {
-            Box(
-                modifier = Modifier
-                    .width(280.dp)
-                    .fillMaxHeight()
-            )
+            Box(Modifier.width(280.dp).fillMaxHeight())
         }
     }
 }

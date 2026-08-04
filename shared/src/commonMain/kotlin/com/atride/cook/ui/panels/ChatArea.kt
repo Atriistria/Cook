@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.atride.cook.ui.DevicePreviews
 
 data class Msg(
     val id: String,
@@ -42,7 +41,7 @@ fun ChatArea(
     modifier: Modifier = Modifier,
     onMenuClick: (() -> Unit)? = null,
 ) {
-    val msgs = listOf(Msg("1", "测试"), Msg("2", "测试", true), Msg("3", "测试"))
+    val msgs = listOf(Msg("1", "测试1"), Msg("2", "测试2", true), Msg("3", "测试3"))
     Column(modifier = modifier) {
         TopAppBar(
             title = { Text("这里是标题") },

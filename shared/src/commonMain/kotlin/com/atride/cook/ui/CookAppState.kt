@@ -2,12 +2,8 @@
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
@@ -15,21 +11,23 @@ import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_L
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXTRA_LARGE_LOWER_BOUND
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_LARGE_LOWER_BOUND
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
+import com.atride.cook.navigation.CookNavigator
+import com.atride.cook.navigation.rememberCookNavigator
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun rememberCookAppState(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    navigator: CookNavigator = rememberCookNavigator(),
 ): CookAppState {
-    return remember { CookAppState(coroutineScope) }
+    return remember { CookAppState(coroutineScope, navigator) }
 }
 
 @Stable
 class CookAppState(
     val coroutineScope: CoroutineScope,
-) {
-    var selectedSessionId by mutableStateOf<String?>(null)
-}
+    val navigator: CookNavigator,
+)
 
 fun sessionPanelWidth(wsc: WindowSizeClass, isTouch: Boolean): Dp = when {
     isTouch && !wsc.isWidthAtLeastBreakpoint(WIDTH_DP_MEDIUM_LOWER_BOUND) -> 0.dp

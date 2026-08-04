@@ -18,6 +18,7 @@ kotlin = "2.3.10"
 kotlinx-coroutines = "1.11.0"
 kotlinx-serialization = "1.8.1"
 material3 = "1.11.0-alpha07"
+navigation3 = "1.1.5"
 navigationCompose = "2.9.2"
 ksp = "2.3.4"
 koin = "4.2.2"
@@ -30,6 +31,7 @@ richeditorCompose = "1.0.0-rc14"
 
 [libraries]
 adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "adaptive" }
+androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 koog-agents = { module = "ai.koog:koog-agents", version.ref = "koogAgents" }

@@ -1,11 +1,11 @@
 package com.atride.cook.common
 
 import cook.shared.generated.resources.Res
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 object SystemPromptLoader {
 

@@ -1,14 +1,15 @@
 ﻿package com.atride.cook.navigation
 
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed interface Route {
+sealed interface Route: NavKey {
     @Serializable
     data object SessionList : Route
 
     @Serializable
-    data class SessionDetail(val sessionId: String) : Route
+    data class SessionDetail(val sessionId: String? = null) : Route
 
     @Serializable
     data object Settings : Route

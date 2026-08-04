@@ -7,8 +7,8 @@ import ai.koog.agents.core.dsl.extension.nodeLLMRequestStreaming
 import ai.koog.agents.core.dsl.extension.nodeLLMSendToolResultsStreaming
 import ai.koog.agents.core.dsl.extension.onTextMessage
 import ai.koog.agents.core.dsl.extension.onToolCalls
-import ai.koog.agents.features.eventHandler.feature.handleEvents
 import ai.koog.agents.core.tools.ToolRegistry
+import ai.koog.agents.features.eventHandler.feature.handleEvents
 import ai.koog.prompt.dsl.prompt
 import ai.koog.prompt.executor.model.PromptExecutor
 import ai.koog.prompt.llm.LLModel
@@ -52,7 +52,7 @@ class KoogChatRepository(
     override suspend fun saveMessages(sessionId: String, messages: List<ChatMessage>) {
         val maxOrder = messageDao.maxSortOrder(sessionId)
         messages.forEachIndexed { index, msg ->
-            messageDao.insert(
+            messageDao.insertOrUpdate(
                 MessageEntity(
                     id = msg.id,
                     sessionId = sessionId,
@@ -72,7 +72,7 @@ class KoogChatRepository(
         channelFlow {
             if (sessionDao.getById(sessionId) == null) {
                 val now = Clock.System.now().toEpochMilliseconds()
-                sessionDao.insertSession(SessionEntity(
+                sessionDao.upsertSession(SessionEntity(
                     id = sessionId,
                     title = "新对话",
                     createdAt = now,
