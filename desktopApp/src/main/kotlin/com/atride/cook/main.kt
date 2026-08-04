@@ -1,6 +1,10 @@
 package com.atride.cook
 
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPosition
+import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import com.atride.cook.di.initKoin
 import com.atride.cook.ui.rememberCookAppState
@@ -14,6 +18,10 @@ fun main() {
         Window(
             onCloseRequest = ::exitApplication,
             title = "Cook",
+            state = WindowState(
+                size = androidx.compose.ui.unit.DpSize(1100.dp, 750.dp),
+                position = WindowPosition.Aligned(Alignment.Center),
+            )
         ) {
             CookTheme {
                 CookApp(

@@ -10,3 +10,10 @@ data class SessionEntity(
     val createdAt: Long,
     val updatedAt: Long,
 )
+
+data class SessionPreviewTuple(
+    val id: String,
+    val title: String,
+    val updatedAt: Long,
+    val lastMessage: String?,
+)

@@ -41,6 +41,10 @@ class CookNavigator(val backStack: MutableList<NavKey>) {
         backStack.add(Route.SessionDetail(id))
     }
 
+    fun deselectSession() {
+        backStack.removeAll { it is Route.SessionDetail }
+    }
+
     fun pushSettings() {
         backStack.removeAll { it is Route.Settings }
         backStack.add(Route.Settings)

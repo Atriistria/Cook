@@ -14,15 +14,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.atride.cook.model.Session
+import com.atride.cook.ui.ChatViewModel
 import com.atride.cook.ui.DevicePreviews
-
-data class Session(
-    val id: String,
-    val title: String
-)
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SessionListPanel(
@@ -30,9 +30,10 @@ fun SessionListPanel(
     onSessionClick: (String) -> Unit,
     onNewSession: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: ChatViewModel = koinViewModel()
 ) {
 
-    val sessions = listOf(Session("1", "测试"), Session("2", "这是测试"), Session("3", "这还是测试"), Session("4", "这不一定是测试"))
+    val sessionList by viewModel.sessionsFlow.collectAsStateWithLifecycle()
 
     Column(modifier = modifier) {
         TextButton(onClick = onNewSession) {
@@ -43,7 +44,7 @@ fun SessionListPanel(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            items(sessions, key = { it.id }) { session ->
+            items(sessionList, key = { it.id }) { session ->
                 SessionItem(
                     session = session,
                     isSelected = session.id == selectedSessionId,

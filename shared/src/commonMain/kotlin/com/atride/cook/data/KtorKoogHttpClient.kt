@@ -54,7 +54,6 @@ class KtorKoogHttpClient(
         }
     }
 
-    // 2. 辅助函数：根据 KClass 动态获取 kotlinx.serialization 的序列化器
     private fun <T : Any> getSerializer(kClass: KClass<T>): KSerializer<T> {
         return kClass.serializer()
     }
@@ -78,7 +77,7 @@ class KtorKoogHttpClient(
         headers: Map<String, String>
     ): R {
         val fullUrl = resolveUrl(baseUrl, path)
-        println("🌟 最终调用的 API 地址是: $fullUrl")
+        println("最终调用的 API 地址是: $fullUrl")
 
         val response = ktorClient.get(fullUrl) {
             applyParamsAndHeaders(parameters, headers)
@@ -96,12 +95,11 @@ class KtorKoogHttpClient(
         headers: Map<String, String>
     ): R {
         val fullUrl = resolveUrl(baseUrl, path)
-        println("🌟 最终调用的 API 地址是: $fullUrl")
+        println("最终调用的 API 地址是: $fullUrl")
 
         val response = ktorClient.post(fullUrl) {
             applyParamsAndHeaders(parameters, headers)
 
-            // 🌟 核心修改：智能解析请求体，防止对已经序列化好的 String 进行二次损坏
             val bodyText = resolveBodyText(requestBody, requestBodyType)
 
             setBody(TextContent(bodyText, ContentType.Application.Json))
@@ -113,7 +111,6 @@ class KtorKoogHttpClient(
         if (response.status.value !in 200..299) {
             throw Exception("HTTP request failed with status ${response.status.value}: $responseText")
         }
-        // 🌟 核心修改：如果是 String 类型，直接返回原始报文，防止 kotlinx-serialization 误判
         return if (responseType == String::class) {
             responseText as R
         } else {
@@ -132,12 +129,11 @@ class KtorKoogHttpClient(
         headers: Map<String, String>
     ): Flow<O> = flow {
         val fullUrl = resolveUrl(baseUrl, path)
-        println("🌟 开始建立 SSE 流式连接: $fullUrl")
+        println("开始建立 SSE 流式连接: $fullUrl")
 
         val bodyText = resolveBodyText(requestBody, requestBodyType)
-        println("🌟 SSE request body: $bodyText")
+        println("SSE request body: $bodyText")
 
-        // 1. 使用 preparePost 建立延迟下载连接
         ktorClient.preparePost(fullUrl) {
             applyParamsAndHeaders(parameters, headers)
             setBody(TextContent(bodyText, ContentType.Application.Json))
@@ -152,12 +148,10 @@ class KtorKoogHttpClient(
 
             val channel = response.bodyAsChannel()
 
-            // 2. 循环读取底层通道，直到通道被服务器关闭
             while (!channel.isClosedForRead) {
                 val line = channel.readUTF8Line() ?: break
                 val trimmed = line.trim()
 
-                // 3. 筛选出标准的 SSE 数据行
                 if (trimmed.startsWith("data: ")) {
                     val rawData = trimmed.substringAfter("data: ").trim()
                     if (rawData == "[DONE]") {
@@ -173,7 +167,7 @@ class KtorKoogHttpClient(
                                 emit(processed)
                             }
                         } catch (e: Exception) {
-                            // 优雅地忽略单个异常分片
+                            // 忽略单个异常分片
                         }
                     }
                 }
@@ -216,9 +210,9 @@ class KtorKoogHttpClient(
 
     private fun <T : Any> resolveBodyText(body: T, kClass: KClass<T>): String {
         return if (body is String) {
-            body // 🌟 如果已经是 String，直接返回，不再二次序列化
+            body // 如果已经是 String，直接返回，不再二次序列化
         } else {
-            json.encodeToString(getSerializer(kClass), body) // 🌟 否则，才进行序列化
+            json.encodeToString(getSerializer(kClass), body) // 否则，才进行序列化
         }
     }
 }

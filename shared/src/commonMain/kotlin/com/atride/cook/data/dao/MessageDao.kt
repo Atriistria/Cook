@@ -24,4 +24,7 @@ interface MessageDao {
 
     @Query("SELECT COALESCE(MAX(sortOrder), -1) FROM messages WHERE sessionId = :sessionId")
     suspend fun maxSortOrder(sessionId: String): Int
+
+    @Query("SELECT * FROM messages WHERE id = :id")
+    suspend fun getById(id: String): MessageEntity?
 }

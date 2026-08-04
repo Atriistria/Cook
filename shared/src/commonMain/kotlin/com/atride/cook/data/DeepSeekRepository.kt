@@ -18,15 +18,9 @@ import kotlinx.serialization.json.putJsonObject
 class DeepSeekRepository(
     private val httpClient: KtorKoogHttpClient,
     private val systemPrompt: String
-) : ChatRepository {
+)  {
 
-    override suspend fun getMessages(sessionId: String): List<ChatMessage> = emptyList()
-
-    override suspend fun saveMessages(sessionId: String, messages: List<ChatMessage>) {
-        // 备份实现，不持久化
-    }
-
-    override fun sendMessageStream(message: String, sessionId: String): Flow<ChatStreamEvent> {
+     fun sendMessageStream(message: String, sessionId: String): Flow<ChatStreamEvent> {
         // 1. 构建请求体 JSON
         val body = buildJsonObject {
             put("model", "deepseek-v4-pro")

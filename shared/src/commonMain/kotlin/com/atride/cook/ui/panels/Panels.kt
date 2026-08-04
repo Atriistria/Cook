@@ -18,6 +18,8 @@ import com.atride.cook.navigation.CookNavigator
 import com.atride.cook.navigation.Route
 import com.atride.cook.ui.screens.SettingsScreen
 import kotlinx.coroutines.launch
+import com.atride.cook.ui.ChatViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
@@ -26,6 +28,7 @@ fun SinglePaneLayout(
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val chatViewModel = koinViewModel<ChatViewModel>()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -34,11 +37,11 @@ fun SinglePaneLayout(
                 SessionListPanel(
                     selectedSessionId = navigator.selectedSessionId ?: "",
                     onSessionClick = { id ->
-                        navigator.openSession(id) // 🌟 使用 navigator 导航
+                        navigator.openSession(id)
                         scope.launch { drawerState.close() }
                     },
                     onNewSession = {
-                        navigator.openSession("new")
+                        navigator.deselectSession()
                         scope.launch { drawerState.close() }
                     },
                     modifier = Modifier.fillMaxHeight(),
@@ -46,7 +49,7 @@ fun SinglePaneLayout(
             }
         },
     ) {
-        when (navigator.currentRoute) { // 🌟 直接使用 navigator 的计算属性
+        when (navigator.currentRoute) {
             is Route.Settings -> SettingsScreen(
                 onNavigateBack = { navigator.goBack() },
             )
@@ -54,7 +57,9 @@ fun SinglePaneLayout(
             else -> ChatArea(
                 selectedSessionId = navigator.selectedSessionId,
                 onMenuClick = { scope.launch { drawerState.open() } },
+                onSessionCreated = { id -> navigator.openSession(id) },
                 modifier = Modifier.fillMaxSize(),
+                viewModel = chatViewModel,
             )
         }
     }
@@ -65,12 +70,14 @@ fun DualPaneLayout(
     navigator: CookNavigator,
     panelWidth: Dp,
 ) {
+    val scope = rememberCoroutineScope()
+    val chatViewModel = koinViewModel<ChatViewModel>()
 
     Row(Modifier.fillMaxSize()) {
         SessionListPanel(
             selectedSessionId = navigator.selectedSessionId ?: "",
             onSessionClick = { id -> navigator.openSession(id) },
-            onNewSession = { navigator.openSession("new") },
+            onNewSession = { navigator.deselectSession() },
             modifier = Modifier.width(panelWidth).fillMaxHeight(),
         )
         Box(Modifier.weight(1f).fillMaxHeight()) {
@@ -82,6 +89,8 @@ fun DualPaneLayout(
                 else -> ChatArea(
                     selectedSessionId = navigator.selectedSessionId,
                     modifier = Modifier.fillMaxSize(),
+                    onSessionCreated = { id -> navigator.openSession(id) },
+                    viewModel = chatViewModel,
                 )
             }
         }
@@ -95,12 +104,14 @@ fun TriplePaneLayout(
     isContextPanelExpanded: Boolean,
     onContextPanelToggle: () -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
+    val chatViewModel = koinViewModel<ChatViewModel>()
 
     Row(Modifier.fillMaxSize()) {
         SessionListPanel(
             selectedSessionId = navigator.selectedSessionId ?: "",
             onSessionClick = { id -> navigator.openSession(id) },
-            onNewSession = { navigator.openSession("new") },
+            onNewSession = { navigator.deselectSession() },
             modifier = Modifier.width(panelWidth).fillMaxHeight(),
         )
         Box(Modifier.weight(1f).fillMaxHeight()) {
@@ -112,6 +123,8 @@ fun TriplePaneLayout(
                 else -> ChatArea(
                     selectedSessionId = navigator.selectedSessionId,
                     modifier = Modifier.fillMaxSize(),
+                    onSessionCreated = { id -> navigator.openSession(id) },
+                    viewModel = chatViewModel,
                 )
             }
         }
